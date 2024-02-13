@@ -1,12 +1,13 @@
-<script>
+<script lang="ts">
 import { page } from '$app/stores';
 import { goto } from "$app/navigation";
 import { calorieDateMap } from '../stores.ts';
-import { onDestroy } from 'svelte';
 
+function updateDateQuery(date: string) {
+  const query = new URLSearchParams();
+  query.set('date', date);
+  goto(`?${query.toString()}`);
 
-if (!calorieDateMap[new Date().toDateString()]) {
-  calorieDateMap.update((map) => ({...map, [new Date().toDateString()]: 0}))
 }
 
 let pathname = '';
@@ -15,16 +16,36 @@ page.subscribe($page =>
   pathname = $page.url.searchParams.get('date')
 )
 
-if (!pathname || typeof pathname !== 'number' || isNaN(new Date(pathname).valueOf())) {
-  const query = new URLSearchParams()
-  query.set('date', new Date().toDateString())
-  goto(`?${query.toString()}`);
+// If the date query param is somehow invalid, try to set it to today
+if (!pathname || typeof pathname !== 'string' || isNaN(new Date(pathname).valueOf())) {
+  updateDateQuery(new Date().toDateString())
 }
 
-function handleClick() {
-  let query = new URLSearchParams($page.url.searchParams.toString());
-  query.set('test', 'wow')
-  goto(`?${query.toString()}`);
+// If there's no calorie set for today, set calories to null
+// We can't set to 0, because people might purposefully set to 0 to fast
+// So we need to identify which days to "skip" when calculating averages,
+// because they forgot to record calories that day,
+// and which days were legitimately 0 calories consumed, but tracked
+$: if ($calorieDateMap[pathname] === undefined) {
+  calorieDateMap.update((map) => {
+    return {...map, [pathname]: null}
+  })
+}
+
+
+
+
+function handleDateBack() {
+  const newDate = new Date(pathname);
+  newDate.setDate(newDate.getDate() - 1);
+  updateDateQuery(newDate.toDateString());
+}
+
+function handleDateForward() {
+  const newDate = new Date(pathname);
+  newDate.setDate(newDate.getDate() + 1);
+  updateDateQuery(newDate.toDateString());
+
 }
 
 </script>
@@ -35,13 +56,13 @@ function handleClick() {
 </svelte:head>
 
 <nav>
-  <button on:click={handleClick}>
+  <button on:click={handleDateBack}>
     {"<"}
   </button>
   <h2>
     {pathname}
   </h2>
-  <button>
+  <button on:click={handleDateForward}>
     {">"}
   </button>
 </nav>
