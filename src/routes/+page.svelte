@@ -47,9 +47,9 @@ function handleClick() {
 </nav>
 
 <section>
-	<h1>
-
-	</h1>
+	<h3>
+    {$calorieDateMap[pathname]}
+	</h3>
 
 
 </section>
