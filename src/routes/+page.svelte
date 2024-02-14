@@ -151,6 +151,7 @@
 		border: 1px solid var(--font-color);
 		background-color: var(--color-bg-1);
 		width: 50%;
+		color: var(--font-color);
 	}
 	input:focus-visible {
 		border: 1px solid var(--color-bg-1);
