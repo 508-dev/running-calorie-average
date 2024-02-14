@@ -2,6 +2,7 @@
 	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
 	import { calorieDateMap } from '../stores.ts';
+	import { calcThreeDay } from '../lib/averages.ts';
 
 	function updateDateQuery(date: string) {
 		const query = new URLSearchParams();
@@ -40,11 +41,16 @@
 		newDate.setDate(newDate.getDate() + 1);
 		updateDateQuery(newDate.toDateString());
 	}
+
+	$: threeDay = calcThreeDay(pathname, $calorieDateMap);
 </script>
 
 <svelte:head>
-	<title>Home</title>
-	<meta name="description" content="Svelte demo app" />
+	<title>Rolling Calorie Averages</title>
+	<meta
+		name="description"
+		content="Get rolling averages of your calorie intake for the last 3 days, week, or month."
+	/>
 </svelte:head>
 
 <nav>
@@ -63,6 +69,14 @@
 	<h3>
 		{$calorieDateMap[pathname]}
 	</h3>
+
+	<input type="number" bind:value={$calorieDateMap[pathname]} />
+</section>
+<section>
+	<div>
+		<span>3 day</span>
+		<span>{threeDay}</span>
+	</div>
 </section>
 
 <style>
