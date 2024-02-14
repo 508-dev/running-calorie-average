@@ -4,6 +4,8 @@
 	import { calorieDateMap } from '../stores.ts';
 	import { calcThreeDay, calcNDay } from '../lib/averages.ts';
 
+	const notEnoughData = 'Not enough data';
+
 	function updateDateQuery(date: string) {
 		const query = new URLSearchParams();
 		query.set('date', date);
@@ -41,9 +43,6 @@
 		newDate.setDate(newDate.getDate() + 1);
 		updateDateQuery(newDate.toDateString());
 	}
-
-	$: threeDay = calcThreeDay(pathname, $calorieDateMap);
-	$: testThreeDay = calcNDay(pathname, 3, $calorieDateMap);
 </script>
 
 <svelte:head>
@@ -74,14 +73,36 @@
 	<input type="number" bind:value={$calorieDateMap[pathname]} />
 </section>
 <section>
-	<div>
-		<span>3 day</span>
-		<span>{threeDay}</span>
-	</div>
-	<div>
-		<span>Test day</span>
-		<span>{testThreeDay}</span>
-	</div>
+	<table>
+		<tr>
+			<th> Running Avg. Length </th>
+			<th> Daily Calorie Average </th>
+		</tr>
+		<tr>
+			<td> 3 days </td>
+			<td>
+				{calcNDay(pathname, 3, $calorieDateMap) || notEnoughData}
+			</td>
+		</tr>
+		<tr>
+			<td> 5 days </td>
+			<td>
+				{calcNDay(pathname, 5, $calorieDateMap) || notEnoughData}
+			</td>
+		</tr>
+		<tr>
+			<td> 2 weeks </td>
+			<td>
+				{calcNDay(pathname, 14, $calorieDateMap) || notEnoughData}
+			</td>
+		</tr>
+		<tr>
+			<td> 1 month </td>
+			<td>
+				{calcNDay(pathname, 30, $calorieDateMap) || notEnoughData}
+			</td>
+		</tr>
+	</table>
 </section>
 
 <style>
