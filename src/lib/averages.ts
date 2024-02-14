@@ -30,7 +30,7 @@ function calcNDay(currDate: string, target: number, calorieDateMap: CalorieDateM
 	});
 
 	// Sum could be null?
-	return sum ? sum / target : sum;
+	return sum ? Math.round(sum / target - nullCount) : sum;
 }
 
-export { calcThreeDay, calcNDay };
+export { calcNDay };
