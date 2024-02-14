@@ -39,4 +39,4 @@ You can preview the production build with `npm run preview`.
 
 # Design
 
-![First draft design for the app](design.png "This is just a first draft")
+![First draft design for the app](design.png 'This is just a first draft')
