@@ -6,6 +6,12 @@
 
 	const notEnoughData = 'Not enough data';
 
+	let resetConfirm = 3;
+
+	$: if (resetConfirm === 0) {
+		calorieDateMap.reset();
+	}
+
 	function updateDateQuery(date: string) {
 		const query = new URLSearchParams();
 		query.set('date', date);
@@ -103,6 +109,11 @@
 			</td>
 		</tr>
 	</table>
+</section>
+<section>
+	<button on:click={() => resetConfirm--}>
+		Click {resetConfirm} times to permanently reset all calorie recordings
+	</button>
 </section>
 
 <style>

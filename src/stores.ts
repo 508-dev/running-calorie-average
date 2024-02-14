@@ -19,6 +19,10 @@ function createCalorieDateMap() {
 			const newStore = cb(get(store));
 			localStorage.calorieMap = JSON.stringify(newStore);
 			set(newStore);
+		},
+		reset: () => {
+			localStorage.calorieMap = JSON.stringify({});
+			set({});
 		}
 	};
 }
