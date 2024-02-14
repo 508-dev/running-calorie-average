@@ -2,7 +2,7 @@
 	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
 	import { calorieDateMap } from '../stores.ts';
-	import { calcThreeDay, calcNDay } from '../lib/averages.ts';
+	import { calcNDay } from '../lib/averages.ts';
 
 	const notEnoughData = 'Not enough data';
 
