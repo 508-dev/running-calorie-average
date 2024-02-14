@@ -71,14 +71,11 @@
 	</button>
 </nav>
 
-<section>
-	<h3>
-		{$calorieDateMap[pathname]}
-	</h3>
-
-	<input type="number" bind:value={$calorieDateMap[pathname]} />
+<section class="todays-calories">
+	<label for="calories">Calories</label>
+	<input id="calories" type="number" bind:value={$calorieDateMap[pathname]} />
 </section>
-<section>
+<section class="calorie-averages">
 	<table>
 		<tr>
 			<th> Running Avg. Length </th>
@@ -121,5 +118,41 @@
 		display: flex;
 		align-items: baseline;
 		justify-content: space-between;
+	}
+
+	label {
+		filter: brightness(0.75);
+		margin-bottom: 5px;
+	}
+
+	.todays-calories {
+		display: flex;
+		flex-flow: column;
+		justify-content: center;
+		align-items: center;
+	}
+
+	.calorie-averages {
+		display: flex;
+		justify-content: center;
+	}
+
+	table {
+		width: 100%;
+	}
+
+	th,
+	td {
+		border-bottom: 1px solid var(--color-theme-3);
+		text-align: center;
+	}
+
+	input {
+		border: 1px solid var(--font-color);
+		background-color: var(--color-bg-1);
+		width: 50%;
+	}
+	input:focus-visible {
+		border: 1px solid var(--color-bg-1);
 	}
 </style>

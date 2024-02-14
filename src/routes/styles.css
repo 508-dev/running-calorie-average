@@ -6,7 +6,7 @@
 	--font-mono: 'Fira Mono', monospace;
 	--color-bg-1: #000;
 	--font-color: #fff;
-	--color-theme-1: ##f38518;
+	--color-theme-1: #f38518;
 	--color-theme-2: #268bd2;
 	--color-theme-3: #7ca668;
 	--color-text: rgba(0, 0, 0, 0.7);
@@ -26,6 +26,10 @@ body {
 	max-width: 430px;
 	margin-left: auto;
 	margin-right: auto;
+}
+
+*:focus-visible {
+	outline: 3px solid var(--color-theme-1);
 }
 
 h1,
@@ -112,4 +116,8 @@ h4 {
 	margin-block-end: 0px;
 	margin-inline-start: 0px;
 	margin-inline-end: 0px;
+}
+
+section {
+	margin: 20px 5px;
 }
