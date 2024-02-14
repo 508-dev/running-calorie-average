@@ -2,7 +2,7 @@
 	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
 	import { calorieDateMap } from '../stores.ts';
-	import { calcThreeDay } from '../lib/averages.ts';
+	import { calcThreeDay, calcNDay } from '../lib/averages.ts';
 
 	function updateDateQuery(date: string) {
 		const query = new URLSearchParams();
@@ -43,6 +43,7 @@
 	}
 
 	$: threeDay = calcThreeDay(pathname, $calorieDateMap);
+	$: testThreeDay = calcNDay(pathname, 3, $calorieDateMap);
 </script>
 
 <svelte:head>
@@ -76,6 +77,10 @@
 	<div>
 		<span>3 day</span>
 		<span>{threeDay}</span>
+	</div>
+	<div>
+		<span>Test day</span>
+		<span>{testThreeDay}</span>
 	</div>
 </section>
 
