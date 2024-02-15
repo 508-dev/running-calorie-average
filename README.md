@@ -1,18 +1,25 @@
-# create-svelte
+# Running Calorie Average Tracker
 
-Everything you need to build a Svelte project, powered by [`create-svelte`](https://github.com/sveltejs/kit/tree/main/packages/create-svelte).
+This is a statically generated SPA that allows users to note down their calories against days,
+and then, if they've recorded enough calorie information, view rolling daily calorie averages for the day
+they're looking at.
 
-## Creating a project
+For example, if you had 1000 calories 3 days ago, 1000 calories 2 days ago, and 2000 calories today, the app
+would inform you that your 3 day calorie average for today is 1333. This is useful for people that monitor
+their calories and want a more flexible system than hyper-strict daily calorie requirements, for example
+allowing such people to make up for a holiday with lots of calories with more aggressive fasting in the
+days before or after.
 
-If you're seeing this, you've probably already done this step. Congrats!
+Data is stored in [local storage](https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage).
+Long term, I'd like a more persistent data storage method, allowing both for true-offline usage (such as
+PWA), as well as eventually persistence against a database.
 
-```bash
-# create a new project in the current directory
-npm create svelte@latest
+The app is developed by the software engineering co-op, [508.dev](https://508.dev). 508.dev LLC is a
+software engineering co-op that functions as a design and development firm, a software consultancy,
+and a software engineering agency.
 
-# create a new project in my-app
-npm create svelte@latest my-app
-```
+If you don't want to use the 508 deployed version of this app, you are free to deploy the code on your own
+in the manner of your choosing. It is licensed under AGPL3.
 
 ## Developing
 
@@ -20,9 +27,6 @@ Once you've created a project and installed dependencies with `npm install` (or 
 
 ```bash
 npm run dev
-
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
 ```
 
 ## Building
@@ -35,7 +39,20 @@ npm run build
 
 You can preview the production build with `npm run preview`.
 
-> To deploy your app, you may need to install an [adapter](https://kit.svelte.dev/docs/adapters) for your target environment.
+## Deployment
+
+This app is currently deployed on github pages. The repo is [mirrored to github](https://github.com/508-dev/running-calorie-average) for this purpose.
+
+A special branch is created for the github pages deployment. Pushes to this branch occur automatically when you run `npm run deploy`.
+
+To deploy, do the following:
+
+```bash
+npm run build
+npm run deploy
+```
+
+Then, either way up to 8 hours for the codeberg repo to automatically mirror to the github repo, or manually trigger an update from codeberg [from within the codeberg repo settings](https://codeberg.org/508_dev/running-calorie-average/settings), if you have access.
 
 # Design
 
