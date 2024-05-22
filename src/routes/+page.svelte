@@ -10,6 +10,8 @@
 
 	$: if (resetConfirm === 0) {
 		calorieDateMap.reset();
+		// Set resetConfirm back to 3 after 1500 milliseconds
+		setTimeout(() => (resetConfirm = 3), 1500);
 	}
 
 	function updateDateQuery(date: string) {
@@ -108,9 +110,12 @@
 	</table>
 </section>
 <section>
-	<button on:click={() => resetConfirm--}>
+	<button disabled={resetConfirm <= 0} on:click={() => resetConfirm--}>
 		Click {resetConfirm} times to permanently reset all calorie recordings
 	</button>
+	{#if resetConfirm === 0}
+		<p>Data has been reset!</p>
+	{/if}
 </section>
 
 <style>
