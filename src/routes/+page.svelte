@@ -8,6 +8,7 @@
 
 	let resetConfirm = 3;
 
+
 	$: if (resetConfirm === 0) {
 		calorieDateMap.reset();
 	}
@@ -49,6 +50,26 @@
 		newDate.setDate(newDate.getDate() + 1);
 		updateDateQuery(newDate.toDateString());
 	}
+
+        // For swiping to change date
+        let startX: number;
+        let endX: number;
+
+        function handleSwipe() {
+                if (startX - endX > 50) {
+                        handleDateForward();
+                } else if (endX - startX > 50) {
+                        handleDateBack();
+                }
+        }
+
+        function handleTouchStart(event: TouchEvent) {
+                startX = event.touches[0].clientX;
+        }
+        function handleTouchEnd(event: TouchEvent) {
+                endX = event.changedTouches[0].clientX;
+                handleSwipe();
+        }
 </script>
 
 <svelte:head>
