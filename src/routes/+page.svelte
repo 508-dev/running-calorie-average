@@ -20,7 +20,10 @@
 
 	let pathname = '';
 
-	page.subscribe(($page) => (pathname = $page.url.searchParams.get('date')));
+	page.subscribe(($page) => {
+		const date = $page.url.searchParams.get('date');
+		pathname = date ?? new Date().toDateString();
+	});
 
 	// If the date query param is somehow invalid, try to set it to today
 	if (!pathname || typeof pathname !== 'string' || isNaN(new Date(pathname).valueOf())) {
