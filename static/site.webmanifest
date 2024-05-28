@@ -1,6 +1,7 @@
 {
 	"name": "Calorie Avgs.",
 	"short_name": "Calorie Avgs.",
+	"start_url": "/",
 	"icons": [
 		{
 			"src": "/android-chrome-192x192.png",
