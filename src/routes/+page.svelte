@@ -84,7 +84,10 @@
 	<button on:click={handleDateBack}>
 		{'<'}
 	</button>
-	<h2>
+	<h2
+                on:touchstart={handleTouchStart}
+                on:touchend={handleTouchEnd}
+        >
 		{pathname}
 	</h2>
 	<button on:click={handleDateForward}>
