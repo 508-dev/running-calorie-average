@@ -8,6 +8,7 @@
 
 	let resetConfirm = 3;
 
+
 	$: if (resetConfirm === 0) {
 		calorieDateMap.reset();
 		// Set resetConfirm back to 3 after 1500 milliseconds
@@ -54,6 +55,26 @@
 		newDate.setDate(newDate.getDate() + 1);
 		updateDateQuery(newDate.toDateString());
 	}
+
+        // For swiping to change date
+        let startX: number;
+        let endX: number;
+
+        function handleSwipe() {
+                if (startX - endX > 50) {
+                        handleDateForward();
+                } else if (endX - startX > 50) {
+                        handleDateBack();
+                }
+        }
+
+        function handleTouchStart(event: TouchEvent) {
+                startX = event.touches[0].clientX;
+        }
+        function handleTouchEnd(event: TouchEvent) {
+                endX = event.changedTouches[0].clientX;
+                handleSwipe();
+        }
 </script>
 
 <svelte:head>
@@ -68,7 +89,10 @@
 	<button on:click={handleDateBack}>
 		{'<'}
 	</button>
-	<h2>
+	<h2
+                on:touchstart={handleTouchStart}
+                on:touchend={handleTouchEnd}
+        >
 		{pathname}
 	</h2>
 	<button on:click={handleDateForward}>
