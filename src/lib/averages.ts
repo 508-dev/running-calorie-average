@@ -1,4 +1,4 @@
-import { type CalorieDateMap } from '../stores';
+import { type CalorieDateMap } from '$lib/stores';
 
 function getDateDiff(date: string, diff: number) {
 	const newDate = new Date(date);
