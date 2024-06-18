@@ -25,6 +25,8 @@ in the manner of your choosing. It is licensed under AGPL3.
 
 Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
 
+>*If `npm install` fails due to an npm issue with optional dependencies, try deleting `package-lock.json` and `node_modules` and try again.*
+
 ```bash
 npm run dev
 ```
@@ -58,4 +60,3 @@ Then, either way up to 8 hours for the codeberg repo to automatically mirror to 
 
 ![First draft design for the app](design.png 'This is just a first draft')
 
-Test
