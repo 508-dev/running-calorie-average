@@ -1,8 +1,11 @@
 <script lang="ts">
+	import { CalendarDate } from '@internationalized/date';
+	import Datepicker from '$lib/components/Datepicker.svelte';
+	import { getMonthNumber } from '$lib/utils';
 	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
-	import { calorieDateMap } from '../stores.ts';
-	import { calcNDay } from '../lib/averages.ts';
+	import { calorieDateMap } from '$lib/stores.ts';
+	import { calcNDay } from '$lib/averages.ts';
 
 	const notEnoughData = 'Not enough data';
 
@@ -22,6 +25,16 @@
 
 	$: currentDate = $page.url.searchParams.get('date');
 	$: pathname = currentDate ?? new Date().toDateString();
+	let splitDate;
+	let calendarDate: CalendarDate;
+	$: if (currentDate) {
+		// Runs every time currentDate changes
+		splitDate = currentDate.split(' ');
+		const year = parseInt(splitDate[3]);
+		const month = getMonthNumber(splitDate[1]);
+		const date = parseInt(splitDate[2]);
+		calendarDate = new CalendarDate(year, month, date);
+	}
 
 	// If the date query param is somehow invalid, try to set it to today
 	if (!pathname || typeof pathname !== 'string' || isNaN(new Date(pathname).valueOf())) {
@@ -85,7 +98,10 @@
 		{'<'}
 	</button>
 	<h2 on:touchstart={handleTouchStart} on:touchend={handleTouchEnd}>
-		{pathname}
+		<div>
+			{pathname}
+			<Datepicker value={calendarDate} />
+		</div>
 	</h2>
 	<button on:click={handleDateForward}>
 		{'>'}
