@@ -17,14 +17,17 @@
 	<Popover.Trigger asChild let:builder>
 		<Button
 			variant="outline"
-			class={cn('w-[280px] justify-start text-left font-normal', !value && 'text-muted-foreground')}
+			class={cn(
+				' w-[280px] justify-start bg-black text-left font-normal',
+				!value && 'text-muted-foreground'
+			)}
 			builders={[builder]}
 		>
 			<CalendarIcon class="mr-2 h-4 w-4" />
 			{value ? df.format(value.toDate(getLocalTimeZone())) : 'Pick a date'}
 		</Button>
 	</Popover.Trigger>
-	<Popover.Content class="w-auto p-0">
+	<Popover.Content class="w-auto bg-black p-0">
 		<Calendar bind:value initialFocus />
 	</Popover.Content>
 </Popover.Root>
