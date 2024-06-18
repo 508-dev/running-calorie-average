@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { Button } from '$lib/components/ui/button/index.js';
 	import { CalendarDate } from '@internationalized/date';
 	import Datepicker from '$lib/components/Datepicker.svelte';
 	import { getMonthNumber } from '$lib/utils';
@@ -94,18 +95,15 @@
 </svelte:head>
 
 <nav>
-	<button on:click={handleDateBack}>
+	<Button variant="outline" on:click={handleDateBack}>
 		{'<'}
-	</button>
-	<h2 on:touchstart={handleTouchStart} on:touchend={handleTouchEnd}>
-		<div>
-			{pathname}
-			<Datepicker value={calendarDate} />
-		</div>
-	</h2>
-	<button on:click={handleDateForward}>
+	</Button>
+	<div on:touchstart={handleTouchStart} on:touchend={handleTouchEnd}>
+		<Datepicker value={calendarDate} />
+	</div>
+	<Button variant="outline" on:click={handleDateForward}>
 		{'>'}
-	</button>
+	</Button>
 </nav>
 
 <section class="todays-calories">
@@ -145,9 +143,9 @@
 	</table>
 </section>
 <section>
-	<button disabled={resetConfirm <= 0} on:click={() => resetConfirm--}>
+	<Button variant="outline" disabled={resetConfirm <= 0} on:click={() => resetConfirm--}>
 		Click {resetConfirm} times to permanently reset all calorie recordings
-	</button>
+	</Button>
 	{#if resetConfirm === 0}
 		<p>Data has been reset!</p>
 	{/if}
