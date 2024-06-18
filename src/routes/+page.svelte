@@ -8,7 +8,6 @@
 
 	let resetConfirm = 3;
 
-
 	$: if (resetConfirm === 0) {
 		calorieDateMap.reset();
 		// Set resetConfirm back to 3 after 1500 milliseconds
@@ -21,12 +20,8 @@
 		goto(`?${query.toString()}`);
 	}
 
-	let pathname = '';
-
-	page.subscribe(($page) => {
-		const date = $page.url.searchParams.get('date');
-		pathname = date ?? new Date().toDateString();
-	});
+	$: currentDate = $page.url.searchParams.get('date');
+	$: pathname = currentDate ?? new Date().toDateString();
 
 	// If the date query param is somehow invalid, try to set it to today
 	if (!pathname || typeof pathname !== 'string' || isNaN(new Date(pathname).valueOf())) {
@@ -56,25 +51,25 @@
 		updateDateQuery(newDate.toDateString());
 	}
 
-        // For swiping to change date
-        let startX: number;
-        let endX: number;
+	// For swiping to change date
+	let startX: number;
+	let endX: number;
 
-        function handleSwipe() {
-                if (startX - endX > 50) {
-                        handleDateForward();
-                } else if (endX - startX > 50) {
-                        handleDateBack();
-                }
-        }
+	function handleSwipe() {
+		if (startX - endX > 50) {
+			handleDateForward();
+		} else if (endX - startX > 50) {
+			handleDateBack();
+		}
+	}
 
-        function handleTouchStart(event: TouchEvent) {
-                startX = event.touches[0].clientX;
-        }
-        function handleTouchEnd(event: TouchEvent) {
-                endX = event.changedTouches[0].clientX;
-                handleSwipe();
-        }
+	function handleTouchStart(event: TouchEvent) {
+		startX = event.touches[0].clientX;
+	}
+	function handleTouchEnd(event: TouchEvent) {
+		endX = event.changedTouches[0].clientX;
+		handleSwipe();
+	}
 </script>
 
 <svelte:head>
@@ -89,10 +84,7 @@
 	<button on:click={handleDateBack}>
 		{'<'}
 	</button>
-	<h2
-                on:touchstart={handleTouchStart}
-                on:touchend={handleTouchEnd}
-        >
+	<h2 on:touchstart={handleTouchStart} on:touchend={handleTouchEnd}>
 		{pathname}
 	</h2>
 	<button on:click={handleDateForward}>
