@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { trimDateISO } from '$lib/utils.ts';
 	import { Button } from '$lib/components/ui/button/index.js';
 	import { parseDate, type CalendarDate } from '@internationalized/date';
 	import Datepicker from '$lib/components/Datepicker.svelte';
@@ -30,8 +31,8 @@
 
 	function handleDateQueryChange() {
 		const date = dateQuery ? new Date(dateQuery) : new Date();
-		dateString = date.toISOString().split('T')[0];
-		calendarDate = parseDate(dateString);
+		dateString = trimDateISO(date); // e.g: 2024-06-20
+		calendarDate = parseDate(dateString); // e.g: new CalendarDate(2024, 6, 20)
 		updateDate(calendarDate);
 	}
 
@@ -59,14 +60,14 @@
 	function handleDateBack() {
 		const newDate = new Date(dateString);
 		newDate.setDate(newDate.getDate() - 1);
-		const dateISOString = newDate.toISOString().split('T')[0];
+		const dateISOString = trimDateISO(newDate);
 		updateDate(parseDate(dateISOString));
 	}
 
 	function handleDateForward() {
 		const newDate = new Date(dateString);
 		newDate.setDate(newDate.getDate() + 1);
-		const dateISOString = newDate.toISOString().split('T')[0];
+		const dateISOString = trimDateISO(newDate);
 		updateDate(parseDate(dateISOString));
 	}
 

@@ -1,9 +1,10 @@
 import { type CalorieDateMap } from '$lib/stores';
+import { trimDateISO } from '$lib/utils';
 
 function getDateDiff(date: string, diff: number) {
 	const newDate = new Date(date);
 	newDate.setDate(newDate.getDate() + diff);
-	return newDate.toDateString();
+	return trimDateISO(newDate)
 }
 
 function calcNDay(currDate: string, target: number, calorieDateMap: CalorieDateMap) {
