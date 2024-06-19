@@ -11,6 +11,10 @@
 	});
 
 	export let value: DateValue | undefined = undefined;
+	export let handleDateChange;
+
+	// TODO: make sure the clicked cell remains active
+	// TODO: close the popover after selection
 </script>
 
 <Popover.Root>
@@ -18,7 +22,7 @@
 		<Button
 			variant="outline"
 			class={cn(
-				' w-[280px] justify-start bg-black text-left font-normal',
+				' w-[280px] justify-start text-left font-normal',
 				!value && 'text-muted-foreground'
 			)}
 			builders={[builder]}
@@ -28,6 +32,6 @@
 		</Button>
 	</Popover.Trigger>
 	<Popover.Content class="w-auto bg-black p-0 text-white">
-		<Calendar bind:value initialFocus />
+		<Calendar bind:value initialFocus onValueChange={(value) => handleDateChange(value)} />
 	</Popover.Content>
 </Popover.Root>
