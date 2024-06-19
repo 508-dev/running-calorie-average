@@ -1,6 +1,11 @@
 <script lang="ts">
 	import CalendarIcon from 'lucide-svelte/icons/calendar';
-	import { DateFormatter, type DateValue, getLocalTimeZone } from '@internationalized/date';
+	import {
+		DateFormatter,
+		type DateValue,
+		getLocalTimeZone,
+		type CalendarDate
+	} from '@internationalized/date';
 	import { cn } from '$lib/utils.js';
 	import { Button } from '$lib/components/ui/button/index.js';
 	import { Calendar } from '$lib/components/ui/calendar/index.js';
@@ -11,13 +16,18 @@
 	});
 
 	export let value: DateValue | undefined = undefined;
-	export let handleDateChange;
+	export let handleDateChange: (date: CalendarDate) => void;
 
+	let popoverOpen = false;
 	// TODO: make sure the clicked cell remains active
-	// TODO: close the popover after selection
+
+	function handleSelectDate(date: CalendarDate) {
+		handleDateChange(date);
+		popoverOpen = false;
+	}
 </script>
 
-<Popover.Root>
+<Popover.Root bind:open={popoverOpen}>
 	<Popover.Trigger asChild let:builder>
 		<Button
 			variant="outline"
@@ -32,6 +42,6 @@
 		</Button>
 	</Popover.Trigger>
 	<Popover.Content class="w-auto bg-black p-0 text-white">
-		<Calendar bind:value initialFocus onValueChange={(value) => handleDateChange(value)} />
+		<Calendar bind:value initialFocus onValueChange={(date) => handleSelectDate(date)} />
 	</Popover.Content>
 </Popover.Root>
