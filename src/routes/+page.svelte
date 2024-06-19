@@ -1,12 +1,12 @@
 <script lang="ts">
 	import { Button } from '$lib/components/ui/button/index.js';
-	import { CalendarDate } from '@internationalized/date';
+	import { parseDate, type CalendarDate } from '@internationalized/date';
 	import Datepicker from '$lib/components/Datepicker.svelte';
-	import { getMonthNumber } from '$lib/utils';
 	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
 	import { calorieDateMap } from '$lib/stores.ts';
 	import { calcNDay } from '$lib/averages.ts';
+	import { onMount } from 'svelte';
 
 	const notEnoughData = 'Not enough data';
 
@@ -18,51 +18,56 @@
 		setTimeout(() => (resetConfirm = 3), 1500);
 	}
 
-	function updateDateQuery(date: string) {
+	function updateDate(date: CalendarDate) {
 		const query = new URLSearchParams();
-		query.set('date', date);
+		query.set('date', date.toString());
 		goto(`?${query.toString()}`);
 	}
 
-	$: currentDate = $page.url.searchParams.get('date');
-	$: pathname = currentDate ?? new Date().toDateString();
-	let splitDate;
+	let dateQuery: string | null;
+	let dateString: string;
 	let calendarDate: CalendarDate;
-	$: if (currentDate) {
-		// Runs every time currentDate changes
-		splitDate = currentDate.split(' ');
-		const year = parseInt(splitDate[3]);
-		const month = getMonthNumber(splitDate[1]);
-		const date = parseInt(splitDate[2]);
-		calendarDate = new CalendarDate(year, month, date);
+
+	function handleDateQueryChange() {
+		const date = dateQuery ? new Date(dateQuery) : new Date();
+		dateString = date.toISOString().split('T')[0];
+		calendarDate = parseDate(dateString);
+		updateDate(calendarDate);
 	}
 
-	// If the date query param is somehow invalid, try to set it to today
-	if (!pathname || typeof pathname !== 'string' || isNaN(new Date(pathname).valueOf())) {
-		updateDateQuery(new Date().toDateString());
+	// Whenever the query params change, update the different date formats
+	$: {
+		dateQuery = $page.url.searchParams.get('date');
+		handleDateQueryChange();
 	}
+
+	onMount(() => {
+		handleDateQueryChange();
+	});
 
 	// If there's no calorie set for today, set calories to null
 	// We can't set to 0, because people might purposefully set to 0 to fast
 	// So we need to identify which days to "skip" when calculating averages,
 	// because they forgot to record calories that day,
 	// and which days were legitimately 0 calories consumed, but tracked
-	$: if ($calorieDateMap[pathname] === undefined) {
+	$: if ($calorieDateMap[dateString] === undefined) {
 		calorieDateMap.update((map) => {
-			return { ...map, [pathname]: null };
+			return { ...map, [dateString]: null };
 		});
 	}
 
 	function handleDateBack() {
-		const newDate = new Date(pathname);
+		const newDate = new Date(dateString);
 		newDate.setDate(newDate.getDate() - 1);
-		updateDateQuery(newDate.toDateString());
+		const dateISOString = newDate.toISOString().split('T')[0];
+		updateDate(parseDate(dateISOString));
 	}
 
 	function handleDateForward() {
-		const newDate = new Date(pathname);
+		const newDate = new Date(dateString);
 		newDate.setDate(newDate.getDate() + 1);
-		updateDateQuery(newDate.toDateString());
+		const dateISOString = newDate.toISOString().split('T')[0];
+		updateDate(parseDate(dateISOString));
 	}
 
 	// For swiping to change date
@@ -99,7 +104,7 @@
 		{'<'}
 	</Button>
 	<div on:touchstart={handleTouchStart} on:touchend={handleTouchEnd}>
-		<Datepicker value={calendarDate} />
+		<Datepicker value={calendarDate} handleDateChange={updateDate} />
 	</div>
 	<Button variant="outline" on:click={handleDateForward}>
 		{'>'}
@@ -108,7 +113,7 @@
 
 <section class="todays-calories">
 	<label for="calories">Calories</label>
-	<input id="calories" type="number" bind:value={$calorieDateMap[pathname]} />
+	<input id="calories" type="number" bind:value={$calorieDateMap[dateString]} />
 </section>
 <section class="calorie-averages">
 	<table>
@@ -119,25 +124,25 @@
 		<tr>
 			<td> 3 days </td>
 			<td>
-				{calcNDay(pathname, 3, $calorieDateMap) || notEnoughData}
+				{calcNDay(dateString, 3, $calorieDateMap) || notEnoughData}
 			</td>
 		</tr>
 		<tr>
 			<td> 5 days </td>
 			<td>
-				{calcNDay(pathname, 5, $calorieDateMap) || notEnoughData}
+				{calcNDay(dateString, 5, $calorieDateMap) || notEnoughData}
 			</td>
 		</tr>
 		<tr>
 			<td> 2 weeks </td>
 			<td>
-				{calcNDay(pathname, 14, $calorieDateMap) || notEnoughData}
+				{calcNDay(dateString, 14, $calorieDateMap) || notEnoughData}
 			</td>
 		</tr>
 		<tr>
 			<td> 1 month </td>
 			<td>
-				{calcNDay(pathname, 30, $calorieDateMap) || notEnoughData}
+				{calcNDay(dateString, 30, $calorieDateMap) || notEnoughData}
 			</td>
 		</tr>
 	</table>
