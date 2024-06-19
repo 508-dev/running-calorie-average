@@ -41,7 +41,7 @@
 			{value ? df.format(value.toDate(getLocalTimeZone())) : 'Pick a date'}
 		</Button>
 	</Popover.Trigger>
-	<Popover.Content class="w-auto bg-black p-0 text-white">
+	<Popover.Content class="dark w-auto p-0 ">
 		<Calendar bind:value initialFocus onValueChange={(date) => handleSelectDate(date)} />
 	</Popover.Content>
 </Popover.Root>
