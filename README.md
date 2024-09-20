@@ -43,16 +43,7 @@ You can preview the production build with `npm run preview`.
 
 This app is currently deployed on github pages. The repo is [mirrored to github](https://github.com/508-dev/running-calorie-average) for this purpose.
 
-A special branch is created for the github pages deployment. Pushes to this branch occur automatically when you run `npm run deploy`.
-
-To deploy, do the following:
-
-```bash
-npm run build
-npm run deploy
-```
-
-Then, either way up to 8 hours for the codeberg repo to automatically mirror to the github repo, or manually trigger an update from codeberg [from within the codeberg repo settings](https://codeberg.org/508_dev/running-calorie-average/settings), if you have access.
+New deployments are triggered automatically on pushes to `main`.
 
 # Design
 
