@@ -3,7 +3,7 @@
 	import { goto } from '$app/navigation';
 	import { calorieDateMap } from '../stores.ts';
 	import { calcNDay } from '../lib/averages.ts';
-	import ExportImportSection from '$lib/components/ExportImportSection.svelte';
+	import DataTransfers from '$lib/components/dataTransfers.svelte';
 
 	const notEnoughData = 'Not enough data';
 
@@ -137,7 +137,7 @@
 		</tr>
 	</table>
 </section>
-<ExportImportSection/>
+<DataTransfers/>
 <section>
 	<button disabled={resetConfirm <= 0} on:click={() => resetConfirm--}>
 		Click {resetConfirm} times to permanently reset all calorie recordings

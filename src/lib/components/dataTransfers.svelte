@@ -117,16 +117,20 @@
     }
 
     let onImport = (data: Record<string, number | null>) => {
-      console.log("Importing data:", data);
       // Ensure the data is in the correct format
       if (typeof data !== "object" || data === null || Array.isArray(data)) {
         importError = "Invalid data format. Expected an object.";
         return;
       }
-      // Update the calorieDateMap store with the imported data
       importError = null;
-      // Convert all values to numbers or null
       for (const key in data) {
+        // Check if key is a valid date string
+        const dateObj = new Date(key);
+        if (isNaN(dateObj.getTime())) {
+          importError = `Invalid date key: "${key}".`;
+          return;
+        }
+        // Check if value is null or a number
         if (data[key] !== null && typeof data[key] !== "number") {
           importError = `Invalid calorie value for date ${key}. Expected a number or null.`;
           return;
