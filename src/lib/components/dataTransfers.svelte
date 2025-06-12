@@ -5,14 +5,27 @@
     let currentTab = "export";
   
     function exportJSON() {
-      const dataStr = JSON.stringify($calorieDateMap, null, 2);
+      // Remove entries with null key or null value
+      const filtered = Object.fromEntries(
+        Object.entries($calorieDateMap).filter(
+          ([key, value]) => key !== "null" && key && value !== null
+        )
+      );
+      const dataStr = JSON.stringify(filtered, null, 2);
       const dataBlob = new Blob([dataStr], { type: "application/json" });
       triggerDownload(dataBlob, `calorie-data-${getDateString()}.json`);
     }
   
     function exportCSV() {
+      // Remove entries with null key or null value
+      const filteredEntries = Object.entries($calorieDateMap).filter(
+          ([key, value]) => key !== "null" && key && value !== null
+        );
       const headers = ["date", "calories"];
-      const csvRows = [headers.join(","), ...Object.entries($calorieDateMap).map(([date, calories]) => `${date},${calories ?? ''}`)];
+      const csvRows = [
+        headers.join(","),
+        ...filteredEntries.map(([date, calories]) => `${date},${calories}`)
+      ];
       const csvString = csvRows.join("\n");
       const dataBlob = new Blob([csvString], { type: "text/csv" });
       triggerDownload(dataBlob, `calorie-data-${getDateString()}.csv`);
@@ -131,8 +144,8 @@
           return;
         }
         // Check if value is null or a number
-        if (data[key] !== null && typeof data[key] !== "number") {
-          importError = `Invalid calorie value for date ${key}. Expected a number or null.`;
+        if (typeof data[key] !== "number") {
+          importError = `Invalid calorie value for date ${key}. Expected a number`;
           return;
         }
         data[key] = data[key] === null ? null : Number(data[key]);
