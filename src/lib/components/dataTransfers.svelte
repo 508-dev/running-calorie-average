@@ -1,37 +1,13 @@
 <script lang="ts">
     import { calorieDateMap } from '../../stores.ts';
-  
+
     let importError: string | null = null;
+    let importSuccess: string | null = null;
     let currentTab = "export";
-  
-    function exportJSON() {
-      // Remove entries with null key or null value
-      const filtered = Object.fromEntries(
-        Object.entries($calorieDateMap).filter(
-          ([key, value]) => key !== "null" && key && value !== null
-        )
-      );
-      const dataStr = JSON.stringify(filtered, null, 2);
-      const dataBlob = new Blob([dataStr], { type: "application/json" });
-      triggerDownload(dataBlob, `calorie-data-${getDateString()}.json`);
-    }
-  
-    function exportCSV() {
-      // Remove entries with null key or null value
-      const filteredEntries = Object.entries($calorieDateMap).filter(
-          ([key, value]) => key !== "null" && key && value !== null
-        );
-      const headers = ["date", "calories"];
-      const csvRows = [
-        headers.join(","),
-        ...filteredEntries.map(([date, calories]) => `${date},${calories}`)
-      ];
-      const csvString = csvRows.join("\n");
-      const dataBlob = new Blob([csvString], { type: "text/csv" });
-      triggerDownload(dataBlob, `calorie-data-${getDateString()}.csv`);
-    }
-  
-    function triggerDownload(blob: Blob, filename: string) {
+
+    const getDateString = (): string => new Date().toISOString().split("T")[0];
+
+    const triggerDownload = (blob: Blob, filename: string): void => {
       const url = URL.createObjectURL(blob);
       const link = document.createElement("a");
       link.href = url;
@@ -40,33 +16,64 @@
       link.click();
       document.body.removeChild(link);
       URL.revokeObjectURL(url);
-    }
-  
-    function getDateString() {
-      return new Date().toISOString().split("T")[0];
-    }
-  
-    function importJSON(event: Event) {
+    };
+
+    const cleanCalorieMap = (map: Record<string, number | null>) =>
+      Object.entries(map).reduce<Record<string, number>>((acc, [key, value]) => {
+        // Only include valid date keys and non-null numbers
+        if (
+          key &&
+          value !== null &&
+          typeof value === "number" &&
+          !isNaN(new Date(key).getTime())
+        ) {
+          acc[key] = value;
+        }
+        return acc;
+      }, {});
+
+    const exportJSON = (): void => {
+      const filtered = cleanCalorieMap($calorieDateMap);
+      if (Object.keys(filtered).length === 0) return;
+      const dataStr = JSON.stringify(filtered, null, 2);
+      const dataBlob = new Blob([dataStr], { type: "application/json" });
+      triggerDownload(dataBlob, `calorie-data-${getDateString()}.json`);
+    };
+
+    const exportCSV = (): void => {
+      const filtered = cleanCalorieMap($calorieDateMap);
+      if (Object.keys(filtered).length === 0) return;
+      const headers = ["date", "calories"];
+      const csvRows = [
+        headers.join(","),
+        ...Object.entries(filtered).map(([date, calories]) => `${date},${calories}`)
+      ];
+      const csvString = csvRows.join("\n");
+      const dataBlob = new Blob([csvString], { type: "text/csv" });
+      triggerDownload(dataBlob, `calorie-data-${getDateString()}.csv`);
+    };
+
+    const importJSON = (event: Event): void => {
       importError = null;
+      importSuccess = null;
       const input = event.target as HTMLInputElement;
       const file = input.files?.[0];
       if (!file) return;
-  
+
       const reader = new FileReader();
       reader.onload = () => {
         try {
           const content = reader.result as string;
           const data = JSON.parse(content);
-          // If already in the correct format, just use it
           if (
             typeof data === "object" &&
             data !== null &&
             !Array.isArray(data)
           ) {
             onImport(data);
+            importSuccess = "JSON imported successfully!";
             return;
           }
-          // If array of {date, calories}, convert to object
           if (
             Array.isArray(data) &&
             data.every((item) => typeof item === "object" && "date" in item && "calories" in item)
@@ -76,24 +83,25 @@
               obj[item.date] = item.calories;
             }
             onImport(obj);
+            importSuccess = "JSON imported successfully!";
             return;
           }
           throw new Error("Invalid data format.");
         } catch (err) {
           importError = `Failed to import JSON: ${err instanceof Error ? err.message : "Unknown error"}`;
         }
+        input.value = "";
       };
-      // Reset input value so the same file can be selected again
-      input.value = "";
       reader.readAsText(file);
-    }
-  
-    function importCSV(event: Event) {
+    };
+
+    const importCSV = (event: Event): void => {
       importError = null;
+      importSuccess = null;
       const input = event.target as HTMLInputElement;
       const file = input.files?.[0];
       if (!file) return;
-  
+
       const reader = new FileReader();
       reader.onload = () => {
         try {
@@ -110,8 +118,8 @@
           const obj: Record<string, number | null> = {};
           rows.slice(1).forEach((row) => {
             const values = row.split(",");
-            const date = values[dateIndex];
-            const caloriesStr = values[caloriesIndex];
+            const date = values[dateIndex]?.trim();
+            const caloriesStr = values[caloriesIndex]?.trim();
             let calories: number | null = null;
             if (caloriesStr !== undefined && caloriesStr !== "") {
               const parsed = parseInt(caloriesStr, 10);
@@ -120,17 +128,16 @@
             obj[date] = calories;
           });
           onImport(obj);
+          importSuccess = "CSV imported successfully!";
         } catch (err) {
           importError = `Failed to import CSV: ${err instanceof Error ? err.message : "Unknown error"}`;
         }
+        input.value = "";
       };
-      // Reset input value so the same file can be selected again
-      input.value = "";
       reader.readAsText(file);
-    }
+    };
 
-    let onImport = (data: Record<string, number | null>) => {
-      // Ensure the data is in the correct format
+    const onImport = (data: Record<string, number | null>): void => {
       if (typeof data !== "object" || data === null || Array.isArray(data)) {
         importError = "Invalid data format. Expected an object.";
         return;
@@ -138,17 +145,15 @@
       importError = null;
       const cleaned: Record<string, number | null> = {};
       for (const key in data) {
-        // Check if key is a valid date string
         const dateObj = new Date(key);
-        if (isNaN(dateObj.getTime())) continue; // skip invalid date keys
-        // Check if value is null or a number
-        if (data[key] !== null && typeof data[key] !== "number") continue; // skip invalid values
+        if (isNaN(dateObj.getTime())) continue;
+        if (data[key] !== null && typeof data[key] !== "number") continue;
         cleaned[key] = data[key];
       }
       calorieDateMap.update(() => ({ ...cleaned }));
     };
   </script>
-  
+
   <div class="card">
     <div class="card-header">
       <h2>Data Export & Import</h2>
@@ -159,37 +164,40 @@
         <button class:selected={currentTab === "export"} on:click={() => (currentTab = "export")}>Export Data</button>
         <button class:selected={currentTab === "import"} on:click={() => (currentTab = "import")}>Import Data</button>
       </div>
-  
+
       {#if currentTab === "export"}
         <div class="export-buttons">
-          <button on:click={exportJSON}>
+          <button on:click={exportJSON} disabled={Object.keys(cleanCalorieMap($calorieDateMap)).length === 0}>
             Export as JSON
           </button>
-          <button on:click={exportCSV}>
+          <button on:click={exportCSV} disabled={Object.keys(cleanCalorieMap($calorieDateMap)).length === 0}>
             Export as CSV
           </button>
         </div>
       {/if}
-  
+
       {#if currentTab === "import"}
         <div class="import-upload">
-          <label for="json-upload" class="upload-box">
+          <label for="json-upload" class="upload-box" aria-label="Import JSON">
             <p>Import JSON</p>
             <input id="json-upload" type="file" accept=".json" on:change={importJSON} hidden />
           </label>
-          <label for="csv-upload" class="upload-box">
+          <label for="csv-upload" class="upload-box" aria-label="Import CSV">
             <p>Import CSV</p>
             <input id="csv-upload" type="file" accept=".csv" on:change={importCSV} hidden />
           </label>
         </div>
-  
+
         {#if importError}
           <div class="error-box">{importError}</div>
+        {/if}
+        {#if importSuccess}
+          <div class="success-box">{importSuccess}</div>
         {/if}
       {/if}
     </div>
   </div>
-  
+
   <style>
     .card {
       background-color: #000;
