@@ -1,6 +1,7 @@
 <script lang="ts">
+    import { onMount } from "svelte";
     import { calorieDateMap } from '../../stores.ts';
-    export let onImport: (data: { date: string; calories: number }[]) => void;
+    export let onImport: (data: Record<string, number | null>) => void;
   
     let importError: string | null = null;
     let currentTab = "export";
@@ -34,7 +35,47 @@
       return new Date().toISOString().split("T")[0];
     }
   
-
+    function importJSON(event: Event) {
+      importError = null;
+      const file = (event.target as HTMLInputElement).files?.[0];
+      if (!file) return;
+  
+      const reader = new FileReader();
+      reader.onload = () => {
+        try {
+          const content = reader.result as string;
+          const data = JSON.parse(content);
+          // If already in the correct format, just use it
+          if (
+            typeof data === "object" &&
+            data !== null &&
+            !Array.isArray(data)
+          ) {
+            console.log("Imported JSON data:", data);
+            onImport(data);
+            return;
+          }
+          // If array of {date, calories}, convert to object
+          if (
+            Array.isArray(data) &&
+            data.every((item) => typeof item === "object" && "date" in item && "calories" in item)
+          ) {
+            const obj: Record<string, number | null> = {};
+            for (const item of data) {
+              obj[item.date] = item.calories;
+            }
+            console.log("Imported JSON data2:", data);
+            onImport(obj);
+            return;
+          }
+          throw new Error("Invalid data format.");
+        } catch (err) {
+          importError = `Failed to import JSON: ${err instanceof Error ? err.message : "Unknown error"}`;
+        }
+      };
+      reader.readAsText(file);
+    }
+  
   </script>
   
   <div class="card">
@@ -63,7 +104,7 @@
         <div class="import-upload">
           <label for="json-upload" class="upload-box">
             <p>Import JSON</p>
-            <input id="json-upload" type="file" accept=".json" hidden />
+            <input id="json-upload" type="file" accept=".json" on:change={importJSON} hidden />
           </label>
           <label for="csv-upload" class="upload-box">
             <p>Import CSV</p>
