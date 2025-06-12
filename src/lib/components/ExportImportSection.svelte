@@ -35,7 +35,8 @@
   
     function importJSON(event: Event) {
       importError = null;
-      const file = (event.target as HTMLInputElement).files?.[0];
+      const input = event.target as HTMLInputElement;
+      const file = input.files?.[0];
       if (!file) return;
   
       const reader = new FileReader();
@@ -49,7 +50,6 @@
             data !== null &&
             !Array.isArray(data)
           ) {
-            console.log("Imported JSON data:", data);
             onImport(data);
             return;
           }
@@ -62,7 +62,6 @@
             for (const item of data) {
               obj[item.date] = item.calories;
             }
-            console.log("Imported JSON data2:", data);
             onImport(obj);
             return;
           }
@@ -71,12 +70,15 @@
           importError = `Failed to import JSON: ${err instanceof Error ? err.message : "Unknown error"}`;
         }
       };
+      // Reset input value so the same file can be selected again
+      input.value = "";
       reader.readAsText(file);
     }
   
     function importCSV(event: Event) {
       importError = null;
-      const file = (event.target as HTMLInputElement).files?.[0];
+      const input = event.target as HTMLInputElement;
+      const file = input.files?.[0];
       if (!file) return;
   
       const reader = new FileReader();
@@ -104,12 +106,13 @@
             }
             obj[date] = calories;
           });
-          console.log("Imported CSV data:", obj);
           onImport(obj);
         } catch (err) {
           importError = `Failed to import CSV: ${err instanceof Error ? err.message : "Unknown error"}`;
         }
       };
+      // Reset input value so the same file can be selected again
+      input.value = "";
       reader.readAsText(file);
     }
 
@@ -180,8 +183,8 @@
       background-color: #000;
       border: 1px solid #333;
       color: white;
-      padding: 1.5rem;
-      margin-top: 2rem;
+      padding: 1rem;
+      margin-top: 1rem;
       border-radius: 0.5rem;
       max-width: 100%;
     }
