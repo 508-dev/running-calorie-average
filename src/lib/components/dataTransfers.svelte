@@ -136,21 +136,16 @@
         return;
       }
       importError = null;
+      const cleaned: Record<string, number | null> = {};
       for (const key in data) {
         // Check if key is a valid date string
         const dateObj = new Date(key);
-        if (isNaN(dateObj.getTime())) {
-          importError = `Invalid date key: "${key}".`;
-          return;
-        }
+        if (isNaN(dateObj.getTime())) continue; // skip invalid date keys
         // Check if value is null or a number
-        if (typeof data[key] !== "number") {
-          importError = `Invalid calorie value for date ${key}. Expected a number`;
-          return;
-        }
-        data[key] = data[key] === null ? null : Number(data[key]);
+        if (data[key] !== null && typeof data[key] !== "number") continue; // skip invalid values
+        cleaned[key] = data[key];
       }
-      calorieDateMap.update((map) => ({ ...data }));
+      calorieDateMap.update(() => ({ ...cleaned }));
     };
   </script>
   
