@@ -1,8 +1,38 @@
 <script lang="ts">
+    import { calorieDateMap } from '../../stores.ts';
     export let onImport: (data: { date: string; calories: number }[]) => void;
   
     let importError: string | null = null;
     let currentTab = "export";
+  
+    function exportJSON() {
+      const dataStr = JSON.stringify($calorieDateMap, null, 2);
+      const dataBlob = new Blob([dataStr], { type: "application/json" });
+      triggerDownload(dataBlob, `calorie-data-${getDateString()}.json`);
+    }
+  
+    function exportCSV() {
+      const headers = ["date", "calories"];
+      const csvRows = [headers.join(","), ...Object.entries($calorieDateMap).map(([date, calories]) => `${date},${calories ?? ''}`)];
+      const csvString = csvRows.join("\n");
+      const dataBlob = new Blob([csvString], { type: "text/csv" });
+      triggerDownload(dataBlob, `calorie-data-${getDateString()}.csv`);
+    }
+  
+    function triggerDownload(blob: Blob, filename: string) {
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    }
+  
+    function getDateString() {
+      return new Date().toISOString().split("T")[0];
+    }
   
 
   </script>
@@ -20,10 +50,10 @@
   
       {#if currentTab === "export"}
         <div class="export-buttons">
-          <button>
+          <button on:click={exportJSON}>
             Export as JSON
           </button>
-          <button>
+          <button on:click={exportCSV}>
             Export as CSV
           </button>
         </div>
