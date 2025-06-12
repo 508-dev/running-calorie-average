@@ -1,7 +1,5 @@
 <script lang="ts">
-    import { onMount } from "svelte";
     import { calorieDateMap } from '../../stores.ts';
-    export let onImport: (data: Record<string, number | null>) => void;
   
     let importError: string | null = null;
     let currentTab = "export";
@@ -76,6 +74,64 @@
       reader.readAsText(file);
     }
   
+    function importCSV(event: Event) {
+      importError = null;
+      const file = (event.target as HTMLInputElement).files?.[0];
+      if (!file) return;
+  
+      const reader = new FileReader();
+      reader.onload = () => {
+        try {
+          const content = reader.result as string;
+          const rows = content.split("\n").filter(Boolean);
+          const headers = rows[0].split(",");
+          const dateIndex = headers.indexOf("date");
+          const caloriesIndex = headers.indexOf("calories");
+
+          if (dateIndex === -1 || caloriesIndex === -1) {
+            throw new Error("CSV must include 'date' and 'calories' columns");
+          }
+
+          const obj: Record<string, number | null> = {};
+          rows.slice(1).forEach((row) => {
+            const values = row.split(",");
+            const date = values[dateIndex];
+            const caloriesStr = values[caloriesIndex];
+            let calories: number | null = null;
+            if (caloriesStr !== undefined && caloriesStr !== "") {
+              const parsed = parseInt(caloriesStr, 10);
+              calories = isNaN(parsed) ? null : parsed;
+            }
+            obj[date] = calories;
+          });
+          console.log("Imported CSV data:", obj);
+          onImport(obj);
+        } catch (err) {
+          importError = `Failed to import CSV: ${err instanceof Error ? err.message : "Unknown error"}`;
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    let onImport = (data: Record<string, number | null>) => {
+      console.log("Importing data:", data);
+      // Ensure the data is in the correct format
+      if (typeof data !== "object" || data === null || Array.isArray(data)) {
+        importError = "Invalid data format. Expected an object.";
+        return;
+      }
+      // Update the calorieDateMap store with the imported data
+      importError = null;
+      // Convert all values to numbers or null
+      for (const key in data) {
+        if (data[key] !== null && typeof data[key] !== "number") {
+          importError = `Invalid calorie value for date ${key}. Expected a number or null.`;
+          return;
+        }
+        data[key] = data[key] === null ? null : Number(data[key]);
+      }
+      calorieDateMap.update((map) => ({ ...data }));
+    };
   </script>
   
   <div class="card">
@@ -108,7 +164,7 @@
           </label>
           <label for="csv-upload" class="upload-box">
             <p>Import CSV</p>
-            <input id="csv-upload" type="file" accept=".csv" hidden />
+            <input id="csv-upload" type="file" accept=".csv" on:change={importCSV} hidden />
           </label>
         </div>
   
