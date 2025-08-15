@@ -55,17 +55,35 @@
 	 * @param event
 	 */
 	function handleDatePicker(event: MouseEvent) {
-		const input = (event.target as HTMLLabelElement).nextElementSibling as HTMLInputElement;
-		input.showPicker();
-		input.onchange = () => {
-			if (input.value) {
-				const [year, month, day] = input.value.split('-').map(Number);
-				const selectedDate = new Date(year, month - 1, day); // month is 0-based
-				if (!isNaN(selectedDate.valueOf())) {
-					updateDateQuery(selectedDate.toDateString());
+		const label = event.target as HTMLLabelElement;
+		const input = document.getElementById('date-picker') as HTMLInputElement;
+		
+		if (input) {
+			// Try to use showPicker if available (modern browsers)
+			if (input.showPicker && typeof input.showPicker === 'function') {
+				try {
+					input.showPicker();
+				} catch (e) {
+					// Fallback: just focus the input
+					input.focus();
+					input.click();
 				}
+			} else {
+				// Fallback for browsers without showPicker support
+				input.focus();
+				input.click();
 			}
-		};
+			
+			input.onchange = () => {
+				if (input.value) {
+					const [year, month, day] = input.value.split('-').map(Number);
+					const selectedDate = new Date(year, month - 1, day); // month is 0-based
+					if (!isNaN(selectedDate.valueOf())) {
+						updateDateQuery(selectedDate.toDateString());
+					}
+				}
+			};
+		}
 	}
 
 	/**
