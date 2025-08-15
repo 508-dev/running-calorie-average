@@ -8,7 +8,12 @@ function createCalorieDateMap() {
 	const store = writable({} as CalorieDateMap);
 	const { subscribe, set } = store;
 
-	localStorage.calorieMap && set(JSON.parse(localStorage.calorieMap));
+	const stored = localStorage.calorieMap ?? '{}';
+	try {
+		set(JSON.parse(stored));
+	} catch {
+		set({});
+	}
 
 	return {
 		subscribe,
