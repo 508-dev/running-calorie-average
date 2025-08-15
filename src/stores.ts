@@ -14,6 +14,7 @@ function createCalorieDateMap() {
 		subscribe,
 		set: (val: CalorieDateMap) => {
 			localStorage.calorieMap = JSON.stringify(val);
+			set(val);
 		},
 		update: (cb: (arg0: CalorieDateMap) => CalorieDateMap) => {
 			const newStore = cb(get(store));
