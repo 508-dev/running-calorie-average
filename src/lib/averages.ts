@@ -8,29 +8,27 @@ function getDateDiff(date: string, diff: number) {
 
 function calcNDay(currDate: string, target: number, calorieDateMap: CalorieDateMap) {
 	const calorieRecords = [];
-	let nullCount = 0;
-	const haltPoint = target / 4;
-	for (let i = 0; i < target; i++) {
-		let newDate = getDateDiff(currDate, i * -1);
-		if (calorieDateMap[newDate]) {
-			calorieRecords.push(calorieDateMap[newDate]);
-		} else {
-			nullCount++;
-		}
-		if (nullCount >= haltPoint) {
+
+	// Start from i=1 to skip today and look at previous days
+	for (let i = 1; i <= target; i++) {
+		const newDate = getDateDiff(currDate, i * -1);
+		const value = calorieDateMap[newDate];
+
+		if (value === null) {
+			// null = forgot to record, breaks the average
 			return null;
+		} else if (value !== undefined) {
+			// has data (including 0 for fasting)
+			calorieRecords.push(value);
 		}
 	}
-	const sum = calorieRecords.reduce((sum, next) => {
-		if (sum && next) {
-			return sum + next;
-		} else {
-			return sum;
-		}
-	});
 
-	// Sum could be null?
-	return sum ? Math.round(sum / target - nullCount) : sum;
+	if (calorieRecords.length < target) {
+		return null;
+	}
+
+	const sum = calorieRecords.reduce((acc, curr) => acc + curr, 0);
+	return Math.round(sum / target);
 }
 
 export { calcNDay };
