@@ -122,3 +122,17 @@ h4 {
 section {
 	margin: 20px 5px;
 }
+
+#date-picker {
+	width: 0;
+	height: 0;
+	outline: none;
+	opacity: 0;
+	border: none;
+}
+
+#date-picker-label {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}

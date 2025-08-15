@@ -13,6 +13,7 @@
 	let calorieInput: HTMLInputElement;
 	let showResetModal = false;
 	let resetSuccess = false;
+	let dateInputValue = '';
 	
 	let startX: number;
 	let endX: number;
@@ -48,6 +49,37 @@
 		newDate.setDate(newDate.getDate() + 1);
 		updateDateQuery(newDate.toDateString());
 	}
+
+	/**
+	 * Handles the date picker input when the label is clicked.
+	 * @param event
+	 */
+	function handleDatePicker(event: MouseEvent) {
+		const input = (event.target as HTMLLabelElement).nextElementSibling as HTMLInputElement;
+		input.showPicker();
+		input.onchange = () => {
+			if (input.value) {
+				const [year, month, day] = input.value.split('-').map(Number);
+				const selectedDate = new Date(year, month - 1, day); // month is 0-based
+				if (!isNaN(selectedDate.valueOf())) {
+					updateDateQuery(selectedDate.toDateString());
+				}
+			}
+		};
+	}
+
+	/**
+	 * Converts a date string in the format "Wed Aug 07 2024" to "YYYY-MM-DD".
+	 * @param dateStr
+	 */
+	function toISODateString(dateStr: string): string {
+		const date = new Date(dateStr);
+		if (isNaN(date.valueOf())) return '';
+		return date.toISOString().slice(0, 10);
+	}
+
+	// Initialize dateInputValue with the current pathname in ISO format
+	$: dateInputValue = toISODateString(pathname);
 
 	function generateCalendarDates(currentDateString: string, calorieMap: Record<string, number | null>) {
 		const currentDate = new Date(currentDateString);
@@ -220,8 +252,11 @@
 				on:touchend={handleTouchEnd}
 				title="Swipe to navigate dates"
 			>
-				<span class="date-main">{formatCurrentDate(pathname)}</span>
-				<span class="date-weekday">{getWeekday(pathname)}</span>
+				<label id="date-picker-label" for="date-picker" on:click={handleDatePicker}>
+					<span class="date-main">{formatCurrentDate(pathname)}</span>
+					<span class="date-weekday">{getWeekday(pathname)}</span>
+				</label>
+				<input type="date" id="date-picker" name="date-picker" bind:value={dateInputValue} style="display: none;">
 			</h2>
 		</div>
 		
