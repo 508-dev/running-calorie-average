@@ -4,6 +4,7 @@
 	import { tick } from 'svelte';
 	import { calorieDateMap } from '../stores.ts';
 	import { calcNDay } from '../lib/averages.ts';
+	import DataTransfers from '$lib/components/dataTransfers.svelte';
 	import '../styles/calendar.css';
 
 	const notEnoughData = 'Not enough data';
@@ -357,7 +358,7 @@
 		</div>
 	</div>
 </section>
-
+<DataTransfers/>
 
 <section class="reset-section">
 	<button class="reset-trigger-button" on:click={() => showResetModal = true}>
