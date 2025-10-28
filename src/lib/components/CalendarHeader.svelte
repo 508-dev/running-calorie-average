@@ -1,23 +1,41 @@
 <script lang="ts">
     import CalendarNav from '$lib/components/CalendarNav.svelte';
-    import { formatCurrentDate } from '$lib/dateHelpers';
+    import { formatCurrentDate, getTodayMonthValue, getYesterdayMonthValue } from '$lib/dateHelpers';
     import { updateDateQuery } from '$lib/updateDate';
+
     export let selectedDate: string;
+    export let calendarMonth: string;
+    export let onMonthNavigation: (direction: 'next' | 'previous') => void;
+    export let onMonthPicker: (monthValue: string) => void;
+
+    function handleTodayClick() {
+        const { monthValue } = getTodayMonthValue();
+        onMonthPicker(monthValue);
+        updateDateQuery(selectedDate, 'today');
+    }
+
+    function handleYesterdayClick() {
+        const { monthValue } = getYesterdayMonthValue();
+        onMonthPicker(monthValue);
+        updateDateQuery(selectedDate, 'yesterday');
+    }
 </script>
 
 <div class="calendar-header">
    <h3>{formatCurrentDate(selectedDate)}</h3>
-      <div class="today-yesterday">
-          <button on:click={() => updateDateQuery(selectedDate, 'today')}>
-            TODAY
-          </button>
-          <button on:click={() => updateDateQuery(selectedDate, 'yesterday')}>
-            YESTERDAY
-          </button>
-      </div>
-  <CalendarNav
-      selectedDate={selectedDate}
-  />
+   <div class="today-yesterday">
+       <button on:click={handleTodayClick}>
+         TODAY
+       </button>
+       <button on:click={handleYesterdayClick}>
+         YESTERDAY
+       </button>
+   </div>
+   <CalendarNav
+       {calendarMonth}
+       {onMonthNavigation}
+       {onMonthPicker}
+   />
 </div>
 
 <style>
@@ -68,6 +86,5 @@
             font-size: 0.45em;
         }
     }
-
 
 </style>

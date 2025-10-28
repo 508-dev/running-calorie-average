@@ -58,3 +58,40 @@ export function toISODateString(dateStr: string): string {
 	if (isNaN(date.valueOf())) return '';
 	return date.toISOString().slice(0, 10);
 }
+
+export function getFirstDayOfMonth(dateString: string): string {
+	const date = new Date(dateString);
+	const firstDay = new Date(date.getFullYear(), date.getMonth(), 1);
+	return firstDay.toDateString();
+}
+
+export function changeCalendarMonth(
+	currentCalendarMonth: string,
+	direction: 'next' | 'previous'
+): string {
+	const date = new Date(currentCalendarMonth);
+	const newMonth =
+		direction === 'next'
+			? new Date(date.getFullYear(), date.getMonth() + 1, 1)
+			: new Date(date.getFullYear(), date.getMonth() - 1, 1);
+	return newMonth.toDateString();
+}
+
+export function getTodayMonthValue(): { monthValue: string } {
+	const today = new Date();
+	const todayYear = today.getFullYear();
+	const todayMonth = today.getMonth();
+	return {
+		monthValue: `${todayYear}-${String(todayMonth + 1).padStart(2, '0')}`
+	};
+}
+
+export function getYesterdayMonthValue(): { monthValue: string } {
+	const yesterday = new Date();
+	yesterday.setDate(yesterday.getDate() - 1);
+	const yesterdayYear = yesterday.getFullYear();
+	const yesterdayMonth = yesterday.getMonth();
+	return {
+		monthValue: `${yesterdayYear}-${String(yesterdayMonth + 1).padStart(2, '0')}`
+	};
+}

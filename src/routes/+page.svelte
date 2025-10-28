@@ -4,7 +4,7 @@
 	import DataTransfers from '$lib/components/dataTransfers.svelte';
 	import { tick } from 'svelte';
 	import { calcNDay } from '../lib/averages.ts';
-	import { toISODateString } from '../lib/dateHelpers.ts';
+	import { changeCalendarMonth, getFirstDayOfMonth, toISODateString } from '../lib/dateHelpers.ts';
 	import { updateDateQuery } from '../lib/updateDate';
 	import { calorieDateMap } from '../stores.ts';
 	import '../styles/calendar.css';
@@ -12,6 +12,7 @@
 	const notEnoughData = 'Not enough data';
 
 	let selectedDate = '';
+	let calendarMonth = '';
 	let calorieInput: HTMLInputElement;
 	let showResetModal = false;
 	let resetSuccess = false;
@@ -20,7 +21,7 @@
 	let startX: number;
 	let endX: number;
 
-	$: calendarDates = generateCalendarDates(selectedDate, $calorieDateMap);
+	$: calendarDates = generateCalendarDates(calendarMonth, $calorieDateMap);
 
 	$: if ($calorieDateMap[selectedDate] === undefined) {
 		calorieDateMap.update((map) => {
@@ -31,13 +32,26 @@
 	page.subscribe(($page) => {
 		const date = $page.url.searchParams.get('date');
 		selectedDate = date ?? new Date().toDateString();
+
+	  if (!calendarMonth) {
+			calendarMonth = getFirstDayOfMonth(selectedDate);
+		}
 	});
+
+	function handleMonthNavigation(direction: 'next' | 'previous') {
+		calendarMonth = changeCalendarMonth(calendarMonth, direction);
+	}
+
+	function handleMonthPicker(monthValue: string) {
+		const [year, month] = monthValue.split('-').map(Number);
+		calendarMonth = new Date(year, month - 1, 1).toDateString();
+	}
 
 	// Initialize dateInputValue with the current pathname in ISO format
 	$: dateInputValue = toISODateString(selectedDate);
 
-	function generateCalendarDates(currentDateString: string, calorieMap: Record<string, number | null>) {
-		const currentDate = new Date(currentDateString);
+	function generateCalendarDates(currentMonthString: string, calorieMap: Record<string, number | null>) {
+		const currentDate = new Date(currentMonthString);
 		const year = currentDate.getFullYear();
 		const month = currentDate.getMonth();
 
@@ -104,9 +118,9 @@
 
 	function handleSwipe() {
 		if (startX - endX > 50) {
-			updateDateQuery(selectedDate, 'nextMonth');
+			handleMonthNavigation('next');
 		} else if (endX - startX > 50) {
-			updateDateQuery(selectedDate, 'previousMonth');
+			handleMonthNavigation('previous');
 		}
 	}
 
@@ -166,7 +180,12 @@
 <svelte:window on:keydown={handleKeydown} />
 
 <section class="calendar" on:touchstart={handleTouchStart} on:touchend={handleTouchEnd}>
-	<CalendarHeader selectedDate={selectedDate} />
+	<CalendarHeader
+		{selectedDate}
+		{calendarMonth}
+		onMonthNavigation={handleMonthNavigation}
+		onMonthPicker={handleMonthPicker}
+	/>
 	<div class="calendar-grid">
 		<div class="calendar-header">
 			<div class="day-name">Sun</div>

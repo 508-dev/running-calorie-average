@@ -1,25 +1,38 @@
 <script lang="ts">
     import { formatMonthTitle } from '../dateHelpers';
-    import { updateDateQuery } from '../updateDate';
-    export let selectedDate: string;
-    $: monthAndYear = formatMonthTitle(selectedDate);
+
+    export let calendarMonth: string;
+    export let onMonthNavigation: (direction: 'next' | 'previous') => void;
+    export let onMonthPicker: (monthValue: string) => void;
+
+    $: monthAndYear = formatMonthTitle(calendarMonth);
+    $: monthInputValue = new Date(calendarMonth).toISOString().slice(0, 7);
+
+    function handleMonthChange(event: Event) {
+        const input = event.target as HTMLInputElement;
+        if (input.value) {
+            onMonthPicker(input.value);
+        }
+    }
 </script>
 
 <div class="calendar-nav-container">
-    <button class="calendar-nav-caret" on:click={() => updateDateQuery(selectedDate, "previousMonth")}>
+    <button class="calendar-nav-caret" on:click={() => onMonthNavigation('previous')}>
         ‹
     </button>
 
     <div class="month-display">
         <p>{monthAndYear}</p>
-        <span class="calendar-icon">📅</span>
         <input
             type="month"
+            bind:value={monthInputValue}
+            on:change={handleMonthChange}
             class="month-input-overlay"
         />
+        <span class="calendar-icon">📅</span>
     </div>
 
-    <button class="calendar-nav-caret" on:click={() => updateDateQuery(selectedDate, "nextMonth")}>
+    <button class="calendar-nav-caret" on:click={() => onMonthNavigation('next')}>
         ›
     </button>
 </div>
