@@ -33,7 +33,7 @@
 		const date = $page.url.searchParams.get('date');
 		selectedDate = date ?? new Date().toDateString();
 
-	  if (!calendarMonth) {
+		if (!calendarMonth) {
 			calendarMonth = getFirstDayOfMonth(selectedDate);
 		}
 	});
@@ -50,7 +50,10 @@
 	// Initialize dateInputValue with the current pathname in ISO format
 	$: dateInputValue = toISODateString(selectedDate);
 
-	function generateCalendarDates(currentMonthString: string, calorieMap: Record<string, number | null>) {
+	function generateCalendarDates(
+		currentMonthString: string,
+		calorieMap: Record<string, number | null>
+	) {
 		const currentDate = new Date(currentMonthString);
 		const year = currentDate.getFullYear();
 		const month = currentDate.getMonth();
@@ -134,7 +137,11 @@
 	}
 
 	// If the date query param is somehow invalid, try to set it to today
-	if (!selectedDate || typeof selectedDate !== 'string' || isNaN(new Date(selectedDate).valueOf())) {
+	if (
+		!selectedDate ||
+		typeof selectedDate !== 'string' ||
+		isNaN(new Date(selectedDate).valueOf())
+	) {
 		updateDateQuery(new Date().toDateString());
 	}
 
@@ -198,7 +205,9 @@
 		</div>
 		{#each calendarDates as date}
 			<div
-				class="calendar-date {date.isCurrentMonth ? 'current-month' : 'other-month'} {date.isToday ? 'today' : ''} {date.dateString === selectedDate ? 'selected' : ''}"
+				class="calendar-date {date.isCurrentMonth ? 'current-month' : 'other-month'} {date.isToday
+					? 'today'
+					: ''} {date.dateString === selectedDate ? 'selected' : ''}"
 				on:click={() => handleCalendarDateClick(date.dateString)}
 				role="button"
 				tabindex="0"
@@ -225,9 +234,7 @@
 				bind:this={calorieInput}
 				on:keydown={(e) => e.key === 'Enter' && handleSaveAndNext()}
 			/>
-			<button class="save-button" on:click={handleSaveAndNext}>
-				Save & Next →
-			</button>
+			<button class="save-button" on:click={handleSaveAndNext}> Save & Next → </button>
 		</div>
 		{#if $calorieDateMap[selectedDate]}
 			<div class="calorie-feedback">
@@ -300,20 +307,17 @@
 		</div>
 	</div>
 </section>
-<DataTransfers/>
+<DataTransfers />
 
 <section class="reset-section">
-	<button class="reset-trigger-button" on:click={() => showResetModal = true}>
+	<button class="reset-trigger-button" on:click={() => (showResetModal = true)}>
 		🗑️ Reset All Data
 	</button>
 
 	{#if resetSuccess}
-		<div class="reset-success-message">
-			✅ All calorie data has been successfully reset!
-		</div>
+		<div class="reset-success-message">✅ All calorie data has been successfully reset!</div>
 	{/if}
 </section>
-
 
 <!-- Reset modal -->
 {#if showResetModal}
@@ -321,29 +325,29 @@
 		<div class="modal-content" on:click|stopPropagation>
 			<div class="modal-header">
 				<h3>⚠️ Confirm Data Reset</h3>
-				<button class="modal-close" on:click={closeModal} aria-label="Close modal">
-					✕
-				</button>
+				<button class="modal-close" on:click={closeModal} aria-label="Close modal"> ✕ </button>
 			</div>
 
 			<div class="modal-body">
 				<p>Are you sure you want to permanently delete all your calorie recordings?</p>
-				<p class="warning-text">This action cannot be undone and will remove all historical data.</p>
+				<p class="warning-text">
+					This action cannot be undone and will remove all historical data.
+				</p>
 
 				<div class="data-summary">
-					<strong>You currently have data for {Object.keys($calorieDateMap).filter(key => $calorieDateMap[key] !== null).length} days</strong>
+					<strong
+						>You currently have data for {Object.keys($calorieDateMap).filter(
+							(key) => $calorieDateMap[key] !== null
+						).length} days</strong
+					>
 				</div>
 			</div>
 
 			<div class="modal-footer">
-				<button class="cancel-button" on:click={closeModal}>
-					Cancel
-				</button>
-				<button class="confirm-reset-button" on:click={confirmReset}>
-					Yes, Reset All Data
-				</button>
-			</div>Í
+				<button class="cancel-button" on:click={closeModal}> Cancel </button>
+				<button class="confirm-reset-button" on:click={confirmReset}> Yes, Reset All Data </button>
+			</div>
+			Í
 		</div>
 	</div>
 {/if}
-

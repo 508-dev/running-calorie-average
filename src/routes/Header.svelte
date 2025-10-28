@@ -3,11 +3,12 @@
 
 <header>
 	<h1>Calorie Rolling Averages</h1>
-  <div>
-	<small>
-		<a href="https://codeberg.org/508_dev/running-calorie-average">Code</a> by <a href="https://508.dev">508.dev</a>
-	</small>
-  </div>
+	<div>
+		<small>
+			<a href="https://codeberg.org/508_dev/running-calorie-average">Code</a> by
+			<a href="https://508.dev">508.dev</a>
+		</small>
+	</div>
 </header>
 
 <style>

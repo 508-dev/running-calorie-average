@@ -38,7 +38,7 @@ This project is actively evolving and we're looking for contributors! Whether yo
 ### 🎓 Perfect for Learning
 
 - **Beginners**: Start with documentation, bug fixes, or small features
-- **Intermediate**: Add new features, improve UI/UX, or optimize performance  
+- **Intermediate**: Add new features, improve UI/UX, or optimize performance
 - **Advanced**: Architect new systems, mentor others, or lead feature development
 
 **Tech Stack**: SvelteKit, TypeScript, Vite, CSS3
@@ -48,13 +48,15 @@ This project is actively evolving and we're looking for contributors! Whether yo
 We welcome contributions from developers of all skill levels! Here's how to get involved:
 
 ### 🎯 Good First Issues
+
 - 📝 Improve documentation or add code comments
-- 🐛 Fix small bugs or UI inconsistencies  
+- 🐛 Fix small bugs or UI inconsistencies
 - 🎨 Enhance styling and user experience
 - ✅ Add unit tests for existing functions
 - 🌐 Improve accessibility features
 
 ### 💡 Feature Ideas
+
 - 🔐 User authentication and cloud sync
 - 📈 Advanced analytics and charts
 - 🎯 Goal setting and achievement tracking
@@ -64,6 +66,7 @@ We welcome contributions from developers of all skill levels! Here's how to get 
 - 📤 More export formats (CSV, JSON, etc.)
 
 ### 📋 Development Workflow
+
 1. **Fork & Clone** the repository
 2. **Create a branch** for your feature: `git checkout -b feature/amazing-feature`
 3. **Install dependencies**: `npm install`
@@ -91,6 +94,7 @@ npm run dev
 > 💡 **Tip**: If `npm install` fails, try deleting `package-lock.json` and `node_modules`, then run `npm install` again.
 
 **Available Scripts**:
+
 - `npm run dev` - Start development server
 - `npm run build` - Build for production
 - `npm run preview` - Preview production build
@@ -126,4 +130,3 @@ Licensed under AGPL-3.0. You're free to use, modify, and deploy this code for yo
 ---
 
 **Ready to contribute?** Check out our [open issues](https://github.com/508-dev/running-calorie-average/issues) and jump in! Every contribution, no matter how small, helps make this project better. 🚀
-
