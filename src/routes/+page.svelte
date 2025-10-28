@@ -1,10 +1,11 @@
 <script lang="ts">
-	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
+	import CalendarHeader from '$lib/components/CalendarHeader.svelte';
 	import DataTransfers from '$lib/components/dataTransfers.svelte';
 	import { tick } from 'svelte';
 	import { calcNDay } from '../lib/averages.ts';
-	import { dateUpdateMap, formatCurrentDate, getWeekday, toISODateString, type UpdateType } from '../lib/dateHelpers.ts';
+	import { toISODateString } from '../lib/dateHelpers.ts';
+	import { updateDateQuery } from '../lib/updateDate';
 	import { calorieDateMap } from '../stores.ts';
 	import '../styles/calendar.css';
 
@@ -20,7 +21,6 @@
 	let endX: number;
 
 	$: calendarDates = generateCalendarDates(selectedDate, $calorieDateMap);
-	$: currentMonthTitle = formatMonthTitle(selectedDate);
 
 	$: if ($calorieDateMap[selectedDate] === undefined) {
 		calorieDateMap.update((map) => {
@@ -32,54 +32,6 @@
 		const date = $page.url.searchParams.get('date');
 		selectedDate = date ?? new Date().toDateString();
 	});
-
-	function updateDateQuery(date: string, updateType?: UpdateType) {
-		const query = new URLSearchParams();
-
-		if (updateType) {
-			const updateFunction = dateUpdateMap[updateType];
-			query.set('date', updateFunction(date));
-		} else {
-			query.set('date', date);
-		}
-		goto(`?${query.toString()}`);
-	}
-
-	/**
-	 * Handles the date picker input when the label is clicked.
-	 * @param event
-	 */
-	function handleDatePicker(event: MouseEvent) {
-		const label = event.target as HTMLLabelElement;
-		const input = document.getElementById('date-picker') as HTMLInputElement;
-
-		if (input) {
-			// Try to use showPicker if available (modern browsers)
-			if (input.showPicker && typeof input.showPicker === 'function') {
-				try {
-					input.showPicker();
-				} catch (e) {
-					// Fallback: just focus the input
-					input.focus();
-					input.click();
-				}
-			} else {
-				// Fallback for browsers without showPicker support
-				input.focus();
-				input.click();
-			}
-
-			input.onchange = () => {
-				if (input.value) {
-					const [year, month, day] = input.value.split('-').map(Number);
-					const selectedDate = new Date(year, month - 1, day); // month is 0-based
-					if (!isNaN(selectedDate.valueOf())) {
-						updateDateQuery(selectedDate.toDateString());
-					}
-				}
-			};
-		}
-	}
 
 	// Initialize dateInputValue with the current pathname in ISO format
 	$: dateInputValue = toISODateString(selectedDate);
@@ -152,9 +104,9 @@
 
 	function handleSwipe() {
 		if (startX - endX > 50) {
-			updateDateQuery(selectedDate, 'nextDay');
+			updateDateQuery(selectedDate, 'nextMonth');
 		} else if (endX - startX > 50) {
-			updateDateQuery(selectedDate, 'previousDay');
+			updateDateQuery(selectedDate, 'previousMonth');
 		}
 	}
 
@@ -170,14 +122,6 @@
 	// If the date query param is somehow invalid, try to set it to today
 	if (!selectedDate || typeof selectedDate !== 'string' || isNaN(new Date(selectedDate).valueOf())) {
 		updateDateQuery(new Date().toDateString());
-	}
-
-	function formatMonthTitle(dateString: string) {
-		const date = new Date(dateString)
-		return date.toLocaleDateString('en-US', {
-			month: 'long',
-			year: 'numeric'
-		});
 	}
 
 	function handleSaveAndNext() {
@@ -221,50 +165,9 @@
 </svelte:head>
 <svelte:window on:keydown={handleKeydown} />
 
-<nav class="calendar-nav">
-	<div class="nav-container">
-		<button class="nav-button nav-prev" on:click={() => updateDateQuery(selectedDate, 'previousDay')} aria-label="Previous day">
-			<span class="nav-icon">←</span>
-			<span class="nav-label">Previous</span>
-		</button>
-
-		<div class="current-date-container">
-			<h2
-				class="current-date"
-				on:touchstart={handleTouchStart}
-				on:touchend={handleTouchEnd}
-				title="Swipe to navigate dates"
-			>
-				<label id="date-picker-label" for="date-picker" on:click={handleDatePicker}>
-					<span class="date-main">{formatCurrentDate(selectedDate)}</span>
-					<span class="date-weekday">{getWeekday(selectedDate)}</span>
-				</label>
-				<input type="date" id="date-picker" name="date-picker" bind:value={dateInputValue} style="display: none;">
-			</h2>
-		</div>
-
-		<button class="nav-button nav-next" on:click={() => updateDateQuery(selectedDate, 'nextDay')} aria-label="Next day">
-			<span class="nav-label">Next</span>
-			<span class="nav-icon">→</span>
-		</button>
-	</div>
-
-	<div class="date-shortcuts">
-		<button class="shortcut-button" on:click={() => updateDateQuery(selectedDate, 'yesterday')}>
-			Yesterday
-		</button>
-		<button class="shortcut-button" on:click={() => updateDateQuery(new Date().toDateString())}>
-			Today
-		</button>
-	</div>
-</nav>
-
-
-<section class="calendar">
-	<div class="calendar-header-nav">
-		<h3 class="calendar-month-title">{currentMonthTitle}</h3>
-	</div>
-    <div class="calendar-grid">
+<section class="calendar" on:touchstart={handleTouchStart} on:touchend={handleTouchEnd}>
+	<CalendarHeader selectedDate={selectedDate} />
+	<div class="calendar-grid">
 		<div class="calendar-header">
 			<div class="day-name">Sun</div>
 			<div class="day-name">Mon</div>
@@ -420,7 +323,8 @@
 				<button class="confirm-reset-button" on:click={confirmReset}>
 					Yes, Reset All Data
 				</button>
-			</div>
+			</div>Í
 		</div>
 	</div>
 {/if}
+

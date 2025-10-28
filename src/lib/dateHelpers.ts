@@ -32,6 +32,14 @@ export function getYesterday(): string {
 	return yesterday.toDateString();
 }
 
+export function formatMonthTitle(dateString: string) {
+	const date = new Date(dateString);
+	return date.toLocaleDateString('en-US', {
+		month: 'long',
+		year: 'numeric'
+	});
+}
+
 export function getToday(): string {
 	return new Date().toDateString();
 }
@@ -50,13 +58,3 @@ export function toISODateString(dateStr: string): string {
 	if (isNaN(date.valueOf())) return '';
 	return date.toISOString().slice(0, 10);
 }
-
-export type UpdateType = 'nextDay' | 'nextMonth' | 'previousDay' | 'previousMonth' | 'yesterday';
-
-export const dateUpdateMap: Record<UpdateType, (dateString: string) => string> = {
-	nextDay: getNextDay,
-	nextMonth: getNextMonth,
-	previousDay: getPreviousDay,
-	previousMonth: getPreviousMonth,
-	yesterday: getYesterday
-};
