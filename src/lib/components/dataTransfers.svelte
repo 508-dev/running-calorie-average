@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { calorieDateMap } from '../../stores.ts';
+	import { calorieDateMap } from '$/stores.ts';
 
 	let importError: string | null = null;
 	let importSuccess: string | null = null;

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { formatMonthTitle } from '../dateHelpers';
+	import { formatMonthTitle } from '$lib/dateHelpers';
 
 	export let calendarMonth: string;
 	export let onMonthNavigation: (direction: 'next' | 'previous') => void;

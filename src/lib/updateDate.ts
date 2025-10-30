@@ -6,7 +6,7 @@ import {
 	getPreviousMonth,
 	getYesterday,
 	getToday
-} from './dateHelpers';
+} from '$lib/dateHelpers';
 
 export type UpdateType =
 	| 'nextDay'

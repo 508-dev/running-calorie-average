@@ -3,11 +3,11 @@
 	import CalendarHeader from '$lib/components/CalendarHeader.svelte';
 	import DataTransfers from '$lib/components/dataTransfers.svelte';
 	import { tick } from 'svelte';
-	import { calcNDay } from '../lib/averages.ts';
-	import { changeCalendarMonth, getFirstDayOfMonth, toISODateString } from '../lib/dateHelpers.ts';
-	import { updateDateQuery } from '../lib/updateDate';
-	import { calorieDateMap } from '../stores.ts';
-	import '../styles/calendar.css';
+	import { calcNDay } from '$lib/averages.ts';
+	import { changeCalendarMonth, getFirstDayOfMonth, toISODateString } from '$lib/dateHelpers.ts';
+	import { updateDateQuery } from '$lib/updateDate.ts';
+	import { calorieDateMap } from '$/stores.ts';
+	import '$/styles/calendar.css';
 
 	const notEnoughData = 'Not enough data';
 
